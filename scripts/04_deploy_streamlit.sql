@@ -17,7 +17,7 @@ USE WAREHOUSE AIR_DEMO_WH;
 CREATE SCHEMA IF NOT EXISTS APP COMMENT = 'Streamlit application';
 
 CREATE OR REPLACE STAGE APP.STREAMLIT_STAGE
-    DIRECTORY = (ENABLE = TRUE)
+    ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE')
     COMMENT = 'Streamlit app files';
 
 /*=============================================================================

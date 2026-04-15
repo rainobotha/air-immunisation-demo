@@ -42,6 +42,7 @@ CREATE OR REPLACE FILE FORMAT BRONZE.CSV_FORMAT
 -- 4. INTERNAL STAGE — CSVs will be uploaded here via Snowsight UI
 CREATE OR REPLACE STAGE BRONZE.AIR_LANDING
     FILE_FORMAT = BRONZE.CSV_FORMAT
+    ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE')
     COMMENT = 'Landing zone for AIR source CSV files';
 
 -- 5. BRONZE TABLES — raw, as-is from source (all STRING to preserve source fidelity)
