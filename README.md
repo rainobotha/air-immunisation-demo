@@ -12,7 +12,8 @@
 
 | Folder | Contents |
 |--------|----------|
-| `data/` | Pre-generated synthetic CSV files (~100K patients, ~2K providers, ~751K vaccinations) |
+| `data/mac/` | Split tar.gz archive of CSV files (macOS/Linux) |
+| `data/windows/` | Split zip archive of CSV files (Windows) |
 | `scripts/` | SQL scripts for bronze/silver/gold layers and Streamlit deployment |
 | `streamlit/` | Streamlit in Snowflake dashboard app |
 | `architecture.html` | Architecture diagram (open in browser) |
@@ -32,11 +33,28 @@ Everything runs from the Snowsight web UI. No installs, no command line, no Pyth
 5. This creates the warehouse, database, schemas, stage, and bronze tables
 6. **Stop when you see the "STOP HERE" comment** — you need to upload files first
 
-### Step 2 — Upload CSV files
+### Step 2 — Extract the CSV files
+
+The data files are compressed and split into 20 MB parts. Choose your OS:
+
+**macOS / Linux** — open Terminal in the `data/mac/` folder:
+```bash
+cat air_data.tar.gz.* | tar xzf -
+```
+
+**Windows** — open PowerShell in the `data/windows/` folder:
+```powershell
+cmd /c "copy /b air_data_win.zip.aa+air_data_win.zip.ab+air_data_win.zip.ac+air_data_win.zip.ad combined.zip"
+Expand-Archive combined.zip .
+```
+
+You should now have: `patients.csv` (~18 MB), `providers.csv` (~275 KB), `vaccinations.csv` (~170 MB).
+
+### Step 3 — Upload CSV files to stage
 
 1. In the left sidebar, navigate to **Data > Databases > AIR_DEMO > BRONZE > Stages > AIR_LANDING**
 2. Click the **+ Files** button
-3. Upload all 3 files from the `data/` folder:
+3. Upload all 3 extracted CSV files:
    - `patients.csv` (~18 MB)
    - `providers.csv` (~275 KB)
    - `vaccinations.csv` (~170 MB — may take a minute)
@@ -46,27 +64,27 @@ Everything runs from the Snowsight web UI. No installs, no command line, no Pyth
    - `RAW_PROVIDERS`: ~2,000 rows
    - `RAW_VACCINATIONS`: ~751,000 rows
 
-### Step 3 — Create silver Dynamic Tables
+### Step 4 — Create silver Dynamic Tables
 
 1. Open a new worksheet (or clear the current one)
 2. Paste the contents of **`scripts/02_silver_dynamic_tables.sql`**
 3. Click **Run All**
 4. This creates 4 Dynamic Tables that automatically cleanse, deduplicate, and enrich the raw data
 
-### Step 4 — Create gold Dynamic Tables
+### Step 5 — Create gold Dynamic Tables
 
 1. Paste the contents of **`scripts/03_gold_dynamic_tables.sql`**
 2. Click **Run All**
 3. This creates 5 analytics-ready Dynamic Tables (coverage rates, trends, provider performance, data quality)
 
-### Step 5 — Trigger initial refresh
+### Step 6 — Trigger initial refresh
 
 1. Paste the contents of **`scripts/05_manual_refresh.sql`**
 2. Click **Run All**
 3. This forces all 9 Dynamic Tables to refresh immediately (otherwise they refresh within the 1-hour target lag)
 4. The verification query shows row counts for every table
 
-### Step 6 — Deploy the Streamlit app
+### Step 7 — Deploy the Streamlit app
 
 1. Open a new worksheet
 2. Paste the contents of **`scripts/04_deploy_streamlit.sql`**
