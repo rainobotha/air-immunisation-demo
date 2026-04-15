@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIR Demo — Architecture</title>
+<style>
+  body { margin: 0; background: #0F1B2D; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  svg  { display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="1200" height="820">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0F1B2D"/>
+      <stop offset="100%" stop-color="#162337"/>
+    </linearGradient>
+    <linearGradient id="sourceGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#374151"/>
+      <stop offset="100%" stop-color="#1F2937"/>
+    </linearGradient>
+    <linearGradient id="bronzeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#92400E"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <linearGradient id="silverGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A16207"/>
+      <stop offset="100%" stop-color="#854D0E"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="snowGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#29B5E8"/>
+      <stop offset="100%" stop-color="#11A3D0"/>
+    </linearGradient>
+    <!-- Arrow marker -->
+    <marker id="arrowWhite" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowCyan" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#29B5E8"/>
+    </marker>
+    <!-- Glow filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="820" fill="url(#bgGrad)" rx="0"/>
+
+  <!-- Title -->
+  <text x="600" y="48" text-anchor="middle" fill="#F1F5F9" font-size="22" font-weight="700" letter-spacing="0.5">Australian Immunisation Register — Snowflake Architecture</text>
+  <text x="600" y="72" text-anchor="middle" fill="#64748B" font-size="13">Medallion Architecture  ·  Dynamic Tables  ·  Zero Orchestration</text>
+
+  <!-- Snowflake boundary -->
+  <rect x="260" y="95" width="920" height="700" rx="16" fill="none" stroke="#29B5E8" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.35"/>
+  <rect x="270" y="86" width="180" height="24" rx="4" fill="#0F1B2D"/>
+  <text x="360" y="102" text-anchor="middle" fill="#29B5E8" font-size="12" font-weight="600">SNOWFLAKE PLATFORM</text>
+
+  <!-- ================================================================ -->
+  <!-- SOURCE (left side, outside Snowflake) -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="240" width="200" height="320" rx="12" fill="url(#sourceGrad)" stroke="#4B5563" stroke-width="1"/>
+  </g>
+  <text x="130" y="272" text-anchor="middle" fill="#E5E7EB" font-size="14" font-weight="700">SOURCE</text>
+  <text x="130" y="290" text-anchor="middle" fill="#9CA3AF" font-size="11">AIR CSV Extracts</text>
+  <line x1="55" y1="302" x2="205" y2="302" stroke="#4B5563" stroke-width="0.5"/>
+  <!-- File icons -->
+  <g transform="translate(55, 315)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500">patients.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9">100K records</text>
+  </g>
+  <g transform="translate(55, 362)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500">providers.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9">2K records</text>
+  </g>
+  <g transform="translate(55, 409)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500">vaccinations.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9">751K records</text>
+  </g>
+  <!-- Python gen note -->
+  <g transform="translate(55, 468)">
+    <rect width="150" height="30" rx="6" fill="#1E3A5F" stroke="#3B82F6" stroke-width="0.5"/>
+    <text x="14" y="20" fill="#60A5FA" font-size="12">🐍</text>
+    <text x="36" y="20" fill="#93C5FD" font-size="10">Synthetic data gen</text>
+  </g>
+
+  <!-- Arrow: Source → Bronze -->
+  <line x1="230" y1="400" x2="290" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+  <text x="260" y="390" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600">PUT +</text>
+  <text x="260" y="400" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600">COPY</text>
+  <text x="260" y="410" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600">INTO</text>
+
+  <!-- ================================================================ -->
+  <!-- BRONZE LAYER -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow)">
+    <rect x="300" y="200" width="190" height="400" rx="12" fill="url(#bronzeGrad)" stroke="#B45309" stroke-width="1"/>
+  </g>
+  <text x="395" y="232" text-anchor="middle" fill="#FEF3C7" font-size="15" font-weight="700">BRONZE</text>
+  <text x="395" y="250" text-anchor="middle" fill="#FDE68A" font-size="10" opacity="0.8">Raw / As-Is</text>
+  <line x1="320" y1="260" x2="470" y2="260" stroke="#B45309" stroke-width="0.5"/>
+  <!-- Tables -->
+  <g transform="translate(318, 275)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600">RAW_PATIENTS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9">STRING dates, as-received</text>
+  </g>
+  <g transform="translate(318, 330)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600">RAW_PROVIDERS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9">Untrimmed, raw format</text>
+  </g>
+  <g transform="translate(318, 385)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600">RAW_VACCINATIONS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9">~751K rows inc. dupes</text>
+  </g>
+  <!-- Metadata note -->
+  <g transform="translate(318, 450)">
+    <rect width="154" height="36" rx="6" fill="#451A03" stroke="#92400E" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="12" y="16" fill="#FBBF24" font-size="9">+ _loaded_at</text>
+    <text x="12" y="30" fill="#FBBF24" font-size="9">+ _source_file</text>
+  </g>
+  <!-- Tech label -->
+  <g transform="translate(330, 510)">
+    <rect width="130" height="22" rx="4" fill="#451A03" stroke="#B45309" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#FDE68A" font-size="9" font-weight="600">COPY INTO  ·  Stage</text>
+  </g>
+
+  <!-- Arrow: Bronze → Silver -->
+  <line x1="490" y1="400" x2="540" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+
+  <!-- ================================================================ -->
+  <!-- SILVER LAYER -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow)">
+    <rect x="550" y="120" width="200" height="560" rx="12" fill="url(#silverGrad)" stroke="#64748B" stroke-width="1"/>
+  </g>
+  <text x="650" y="152" text-anchor="middle" fill="#E2E8F0" font-size="15" font-weight="700">SILVER</text>
+  <text x="650" y="170" text-anchor="middle" fill="#94A3B8" font-size="10">Cleansed / Conformed</text>
+  <line x1="570" y1="180" x2="730" y2="180" stroke="#64748B" stroke-width="0.5"/>
+
+  <!-- Dynamic Table badge -->
+  <g transform="translate(580, 190)">
+    <rect width="140" height="20" rx="10" fill="#29B5E8" opacity="0.15" stroke="#29B5E8" stroke-width="0.5"/>
+    <text x="70" y="14" text-anchor="middle" fill="#29B5E8" font-size="9" font-weight="700">⚡ DYNAMIC TABLES</text>
+  </g>
+
+  <g transform="translate(568, 222)">
+    <rect width="164" height="52" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600">PATIENTS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9">Parsed DOB, age groups</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9">Indigenous flag, INITCAP</text>
+  </g>
+  <g transform="translate(568, 284)">
+    <rect width="164" height="44" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600">PROVIDERS</text>
+    <text x="12" y="34" fill="#94A3B8" font-size="9">Standardised, trimmed</text>
+  </g>
+  <g transform="translate(568, 338)">
+    <rect width="164" height="52" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600">VACCINATIONS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9">Deduplicated (ROW_NUMBER)</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9">Parsed dates, typed doses</text>
+  </g>
+  <g transform="translate(568, 402)">
+    <rect width="164" height="58" rx="6" fill="#1E293B" stroke="#38BDF8" stroke-width="1"/>
+    <text x="12" y="18" fill="#38BDF8" font-size="11" font-weight="700">VACCINATION_EVENTS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9">Enriched fact table</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9">Patient + Provider joined</text>
+  </g>
+
+  <!-- Transformations list -->
+  <g transform="translate(568, 480)">
+    <rect width="164" height="110" rx="6" fill="#0F172A" stroke="#475569" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="12" y="18" fill="#94A3B8" font-size="10" font-weight="600">Transformations:</text>
+    <text x="16" y="34" fill="#67E8F9" font-size="9">✓ TRY_TO_DATE parsing</text>
+    <text x="16" y="48" fill="#67E8F9" font-size="9">✓ INITCAP / TRIM / UPPER</text>
+    <text x="16" y="62" fill="#67E8F9" font-size="9">✓ ROW_NUMBER dedup</text>
+    <text x="16" y="76" fill="#67E8F9" font-size="9">✓ Age group derivation</text>
+    <text x="16" y="90" fill="#67E8F9" font-size="9">✓ Reporting lag calc</text>
+    <text x="16" y="104" fill="#67E8F9" font-size="9">✓ NULL / empty handling</text>
+  </g>
+
+  <!-- Tech label -->
+  <g transform="translate(585, 606)">
+    <rect width="130" height="22" rx="4" fill="#0F172A" stroke="#64748B" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600">TARGET_LAG = 1 hour</text>
+  </g>
+
+  <!-- Arrow: Silver → Gold -->
+  <line x1="750" y1="400" x2="800" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+
+  <!-- ================================================================ -->
+  <!-- GOLD LAYER -->
+  <!-- ================================================================ -->
+  <g filter="url(#shadow)">
+    <rect x="810" y="120" width="200" height="480" rx="12" fill="url(#goldGrad)" stroke="#CA8A04" stroke-width="1"/>
+  </g>
+  <text x="910" y="152" text-anchor="middle" fill="#FEF9C3" font-size="15" font-weight="700">GOLD</text>
+  <text x="910" y="170" text-anchor="middle" fill="#FDE68A" font-size="10" opacity="0.8">Analytics-Ready</text>
+  <line x1="830" y1="180" x2="990" y2="180" stroke="#CA8A04" stroke-width="0.5"/>
+
+  <!-- Dynamic Table badge -->
+  <g transform="translate(840, 190)">
+    <rect width="140" height="20" rx="10" fill="#29B5E8" opacity="0.15" stroke="#29B5E8" stroke-width="0.5"/>
+    <text x="70" y="14" text-anchor="middle" fill="#29B5E8" font-size="9" font-weight="700">⚡ DYNAMIC TABLES</text>
+  </g>
+
+  <g transform="translate(828, 222)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600">COVERAGE_BY_STATE_AGE</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9">Coverage rates, targets</text>
+  </g>
+  <g transform="translate(828, 276)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600">MONTHLY_VAX_TRENDS</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9">Volume, patients, lag</text>
+  </g>
+  <g transform="translate(828, 330)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600">PROVIDER_PERFORMANCE</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9">Activity, timeliness, NIP %</text>
+  </g>
+  <g transform="translate(828, 384)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600">DATA_QUALITY_SUMMARY</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9">Parse failures, cleansing</text>
+  </g>
+  <g transform="translate(828, 438)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600">CHILDHOOD_MILESTONES</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9">1yr, 2yr, 5yr coverage</text>
+  </g>
+
+  <!-- Tech label -->
+  <g transform="translate(845, 504)">
+    <rect width="130" height="22" rx="4" fill="#451A03" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#FDE68A" font-size="9" font-weight="600">TARGET_LAG = 1 hour</text>
+  </g>
+
+  <!-- ================================================================ -->
+  <!-- STREAMLIT APP (bottom) -->
+  <!-- ================================================================ -->
+  <!-- Arrow: Gold → App -->
+  <line x1="910" y1="605" x2="910" y2="650" stroke="#29B5E8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="560" y="660" width="580" height="120" rx="14" fill="url(#appGrad)" stroke="#3B82F6" stroke-width="1.5"/>
+  </g>
+  <!-- Streamlit icon area -->
+  <text x="600" y="700" fill="#FFFFFF" font-size="28">📊</text>
+  <text x="640" y="695" fill="#FFFFFF" font-size="16" font-weight="700">Streamlit in Snowflake</text>
+  <text x="640" y="714" fill="#BFDBFE" font-size="11">No separate app server — runs inside Snowflake</text>
+
+  <!-- Tab pills -->
+  <g transform="translate(580, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600">Overview</text>
+  </g>
+  <g transform="translate(668, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600">Coverage</text>
+  </g>
+  <g transform="translate(756, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600">Trends</text>
+  </g>
+  <g transform="translate(844, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600">Providers</text>
+  </g>
+  <g transform="translate(932, 726)">
+    <rect width="86" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="43" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600">Data Quality</text>
+  </g>
+
+  <!-- Arrow: Silver → App too -->
+  <path d="M 650 600 L 650 640 Q 650 660 670 660 L 700 660" fill="none" stroke="#29B5E8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowCyan)" opacity="0.5"/>
+
+  <!-- ================================================================ -->
+  <!-- WAREHOUSE (top right) -->
+  <!-- ================================================================ -->
+  <g transform="translate(1020, 120)">
+    <rect width="140" height="70" rx="10" fill="#0F172A" stroke="#29B5E8" stroke-width="1" filter="url(#shadow)"/>
+    <text x="70" y="22" text-anchor="middle" fill="#29B5E8" font-size="12" font-weight="700">⚡ WAREHOUSE</text>
+    <text x="70" y="40" text-anchor="middle" fill="#E2E8F0" font-size="11" font-weight="600">AIR_DEMO_WH</text>
+    <text x="70" y="56" text-anchor="middle" fill="#94A3B8" font-size="10">X-Small · Auto-suspend 60s</text>
+  </g>
+
+  <!-- Cost callout -->
+  <g transform="translate(1020, 210)">
+    <rect width="140" height="48" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="1"/>
+    <text x="70" y="20" text-anchor="middle" fill="#6EE7B7" font-size="10" font-weight="700">💰 COST ESTIMATE</text>
+    <text x="70" y="38" text-anchor="middle" fill="#A7F3D0" font-size="13" font-weight="700">~$0.50 / run</text>
+  </g>
+
+  <!-- VS Databricks callout -->
+  <g transform="translate(1020, 280)">
+    <rect width="140" height="110" rx="8" fill="#1E1B4B" stroke="#818CF8" stroke-width="1"/>
+    <text x="70" y="18" text-anchor="middle" fill="#C7D2FE" font-size="9" font-weight="700">VS DATABRICKS</text>
+    <line x1="20" y1="24" x2="120" y2="24" stroke="#4338CA" stroke-width="0.5"/>
+    <text x="14" y="40" fill="#E0E7FF" font-size="8.5">✗ Cluster spin-up</text>
+    <text x="14" y="54" fill="#E0E7FF" font-size="8.5">✗ Spark configuration</text>
+    <text x="14" y="68" fill="#E0E7FF" font-size="8.5">✗ Delta Lake setup</text>
+    <text x="14" y="82" fill="#E0E7FF" font-size="8.5">✗ Airflow / scheduling</text>
+    <text x="14" y="96" fill="#E0E7FF" font-size="8.5">✗ Separate BI tool</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="600" y="810" text-anchor="middle" fill="#475569" font-size="10">Australian Immunisation Register · Synthetic Data Demo · Snowflake 2026</text>
+
+</svg>
+</body>
+</html>

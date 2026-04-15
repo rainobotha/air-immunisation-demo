@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AIR Immunisation Demo — User Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    color: #1E293B;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font-size: 10.5pt;
+  }
+
+  /* ---------- Cover page ---------- */
+  .cover {
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    background: linear-gradient(165deg, #0F1B2D 0%, #1E3A5F 50%, #29B5E8 100%);
+    color: #fff;
+    padding: 60px 40px;
+  }
+  .cover-logo {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    margin-bottom: 36px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .cover h1 {
+    font-size: 32pt;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin: 0 0 12px 0;
+    line-height: 1.15;
+  }
+  .cover .subtitle {
+    font-size: 14pt;
+    opacity: 0.85;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+  .cover-meta {
+    font-size: 10pt;
+    opacity: 0.6;
+    margin-top: auto;
+    padding-top: 60px;
+  }
+  .cover-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .cover-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* ---------- Page content ---------- */
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc {
+    page-break-after: always;
+  }
+  .toc h2 { font-size: 18pt; color: #0F1B2D; border: none; padding: 0; margin-bottom: 24px; }
+  .toc-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dotted #CBD5E1;
+    font-size: 11pt;
+  }
+  .toc-entry .num { color: #29B5E8; font-weight: 700; margin-right: 10px; min-width: 20px; }
+  .toc-entry .title { flex: 1; font-weight: 500; }
+
+  /* ---------- Typography ---------- */
+  h2 {
+    font-size: 17pt;
+    font-weight: 700;
+    color: #0F1B2D;
+    border-bottom: 3px solid #29B5E8;
+    padding-bottom: 8px;
+    margin: 40px 0 20px 0;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #1E3A5F;
+    margin: 28px 0 12px 0;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #334155;
+    margin: 20px 0 8px 0;
+  }
+  p { margin: 0 0 12px 0; }
+  ul, ol { margin: 0 0 12px 0; padding-left: 24px; }
+  li { margin-bottom: 4px; }
+
+  /* ---------- Tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 20px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+  th {
+    background: #0F1B2D;
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #E2E8F0;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #F8FAFC; }
+
+  /* ---------- Code ---------- */
+  code {
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 9pt;
+    color: #1E40AF;
+  }
+  pre {
+    background: #0F172A;
+    color: #E2E8F0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 8.5pt;
+    line-height: 1.5;
+    margin: 12px 0 20px 0;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+  .kw { color: #818CF8; }
+  .fn { color: #34D399; }
+  .str { color: #FBBF24; }
+  .cm { color: #64748B; }
+
+  /* ---------- Info boxes ---------- */
+  .box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    page-break-inside: avoid;
+  }
+  .box-blue {
+    background: #EFF6FF;
+    border-left: 4px solid #29B5E8;
+  }
+  .box-green {
+    background: #F0FDF4;
+    border-left: 4px solid #22C55E;
+  }
+  .box-amber {
+    background: #FFFBEB;
+    border-left: 4px solid #F59E0B;
+  }
+  .box-purple {
+    background: #F5F3FF;
+    border-left: 4px solid #8B5CF6;
+  }
+  .box strong { display: block; margin-bottom: 4px; }
+
+  /* ---------- Step boxes ---------- */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+    page-break-inside: avoid;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    background: #29B5E8;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14pt;
+    margin-top: 2px;
+  }
+  .step-body { flex: 1; }
+  .step-body h4 { margin-top: 4px; }
+
+  /* ---------- Architecture diagram placeholder ---------- */
+  .arch-diagram {
+    background: linear-gradient(135deg, #0F1B2D, #1E3A5F);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 20px 0;
+    color: #E2E8F0;
+    page-break-inside: avoid;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .arch-box {
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 9.5pt;
+    min-width: 110px;
+  }
+  .arch-source { background: #374151; border: 1px solid #6B7280; }
+  .arch-bronze { background: #78350F; border: 1px solid #B45309; color: #FDE68A; }
+  .arch-silver { background: #334155; border: 1px solid #64748B; }
+  .arch-gold   { background: #713F12; border: 1px solid #CA8A04; color: #FEF9C3; }
+  .arch-app    { background: #1E40AF; border: 1px solid #3B82F6; color: #DBEAFE; }
+  .arch-arrow  { font-size: 18pt; color: #29B5E8; font-weight: 300; }
+  .arch-label  { font-size: 8pt; opacity: 0.7; display: block; margin-top: 4px; font-weight: 400; }
+  .arch-sub    { font-size: 8pt; opacity: 0.6; display: block; font-weight: 400; }
+
+  /* ---------- Comparison table ---------- */
+  .compare-sf { color: #29B5E8; font-weight: 600; }
+  .compare-db { color: #94A3B8; }
+  .check { color: #22C55E; }
+  .cross { color: #EF4444; }
+
+  /* ---------- Section break ---------- */
+  .section-break { page-break-before: always; }
+
+  /* ---------- Footer ---------- */
+  .doc-footer {
+    text-align: center;
+    font-size: 8.5pt;
+    color: #94A3B8;
+    padding-top: 40px;
+    margin-top: 40px;
+    border-top: 1px solid #E2E8F0;
+  }
+
+  /* ---------- KPI row ---------- */
+  .kpi-row {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  .kpi-card {
+    flex: 1;
+    min-width: 140px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+  .kpi-card .value {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #0F1B2D;
+    line-height: 1.1;
+  }
+  .kpi-card .label {
+    font-size: 8.5pt;
+    color: #64748B;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  @media print {
+    body { font-size: 10pt; }
+    .cover { min-height: 100vh; }
+    .page { padding: 0; }
+    pre { font-size: 8pt; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!--  COVER PAGE                                                        -->
+<!-- ================================================================== -->
+<div class="cover">
+  <div class="cover-logo">💉</div>
+  <h1>Australian Immunisation<br>Register Demo</h1>
+  <div class="subtitle">
+    End-to-End Data Pipeline &amp; Analytics on Snowflake
+  </div>
+  <div class="cover-badges">
+    <span class="cover-badge">Medallion Architecture</span>
+    <span class="cover-badge">Dynamic Tables</span>
+    <span class="cover-badge">Zero Orchestration</span>
+    <span class="cover-badge">Streamlit in Snowflake</span>
+  </div>
+  <div class="cover-meta">
+    User Guide &amp; Deployment Instructions<br>
+    April 2026 &nbsp;·&nbsp; Version 1.0
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!--  TABLE OF CONTENTS                                                 -->
+<!-- ================================================================== -->
+<div class="page toc">
+  <h2>Contents</h2>
+  <div class="toc-entry"><span class="num">1</span> <span class="title">Introduction &amp; Objectives</span></div>
+  <div class="toc-entry"><span class="num">2</span> <span class="title">The Australian Immunisation Register</span></div>
+  <div class="toc-entry"><span class="num">3</span> <span class="title">Synthetic Dataset</span></div>
+  <div class="toc-entry"><span class="num">4</span> <span class="title">Architecture Overview</span></div>
+  <div class="toc-entry"><span class="num">5</span> <span class="title">Pipeline Detail: Bronze Layer</span></div>
+  <div class="toc-entry"><span class="num">6</span> <span class="title">Pipeline Detail: Silver Layer (Dynamic Tables)</span></div>
+  <div class="toc-entry"><span class="num">7</span> <span class="title">Pipeline Detail: Gold Layer (Dynamic Tables)</span></div>
+  <div class="toc-entry"><span class="num">8</span> <span class="title">Streamlit Dashboard</span></div>
+  <div class="toc-entry"><span class="num">9</span> <span class="title">Deployment Guide</span></div>
+  <div class="toc-entry"><span class="num">10</span> <span class="title">Snowflake vs Databricks</span></div>
+  <div class="toc-entry"><span class="num">11</span> <span class="title">Cost Estimate</span></div>
+  <div class="toc-entry"><span class="num">12</span> <span class="title">Cleanup</span></div>
+  <div class="toc-entry"><span class="num">13</span> <span class="title">Repository Structure</span></div>
+</div>
+
+<!-- ================================================================== -->
+<!--  1. INTRODUCTION                                                   -->
+<!-- ================================================================== -->
+<div class="page">
+
+<h2>1. Introduction &amp; Objectives</h2>
+
+<p>
+  This demo showcases a complete, production-style data pipeline built entirely on
+  <strong>Snowflake</strong> — from raw file ingestion through to an interactive analytics
+  dashboard — using the <strong>Australian Immunisation Register (AIR)</strong> as the use case.
+</p>
+
+<p>The objectives of this demo are to illustrate:</p>
+
+<ul>
+  <li><strong>Simplicity</strong> — The entire pipeline is pure SQL. No Spark, no PySpark notebooks, no cluster configuration, no Airflow DAGs.</li>
+  <li><strong>Zero orchestration</strong> — Snowflake Dynamic Tables handle all pipeline scheduling and incremental refresh automatically.</li>
+  <li><strong>Cost effectiveness</strong> — Everything runs on an X-Small warehouse (~$0.50 total) with 60-second auto-suspend.</li>
+  <li><strong>Integrated analytics</strong> — The Streamlit dashboard runs inside Snowflake. No separate BI tool, no app server, no additional infrastructure.</li>
+  <li><strong>Data quality handling</strong> — The pipeline demonstrates real-world data quality challenges (malformed dates, duplicates, missing values) and how they are resolved declaratively.</li>
+</ul>
+
+<div class="box box-blue">
+  <strong>Target Audience</strong>
+  Technical decision-makers evaluating Snowflake against Databricks. The demo is designed
+  to be self-service — clone the repo, follow the steps, and see results in under 30 minutes.
+</div>
+
+<!-- ================================================================== -->
+<!--  2. ABOUT AIR                                                      -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">2. The Australian Immunisation Register</h2>
+
+<p>
+  The <strong>Australian Immunisation Register (AIR)</strong> is a national register that records
+  all vaccinations given to people of all ages in Australia. It is managed by
+  <strong>Services Australia</strong> on behalf of the Department of Health and Aged Care.
+</p>
+
+<h3>What the AIR captures</h3>
+<p>
+  Vaccination providers (GPs, pharmacies, hospitals, community health centres, Aboriginal
+  Medical Services, and school programs) are required by law to report all vaccinations
+  administered to the AIR within 10 working days. The data captured includes:
+</p>
+
+<table>
+  <tr><th>Category</th><th>Data Elements</th></tr>
+  <tr><td><strong>Patient identity</strong></td><td>Medicare number, first name, last name, date of birth, gender</td></tr>
+  <tr><td><strong>Demographics</strong></td><td>State/territory, postcode, address, Indigenous status</td></tr>
+  <tr><td><strong>Vaccination details</strong></td><td>Vaccine brand, antigen(s), dose number, batch number, vial serial number</td></tr>
+  <tr><td><strong>Administration</strong></td><td>Date administered, date reported, administration site (left arm, right thigh, etc.), route (IM, SC, oral)</td></tr>
+  <tr><td><strong>Provider</strong></td><td>Provider number, practice name, provider type, state</td></tr>
+  <tr><td><strong>Funding</strong></td><td>NIP-funded (Y/N), school program (Y/N)</td></tr>
+</table>
+
+<h3>National Immunisation Program (NIP) Schedule</h3>
+<p>
+  The NIP schedule defines the vaccines provided free of charge to eligible Australians.
+  For children, this includes vaccinations at birth, 2, 4, 6, 12, and 18 months, and at
+  4 years of age. Key vaccines include:
+</p>
+
+<table>
+  <tr><th>Age</th><th>Vaccine</th><th>Protects Against</th></tr>
+  <tr><td>Birth</td><td>Engerix-B Paediatric</td><td>Hepatitis B</td></tr>
+  <tr><td>2, 4, 6 months</td><td>Infanrix Hexa</td><td>Diphtheria, Tetanus, Pertussis, Hib, Polio, Hepatitis B</td></tr>
+  <tr><td>2, 4 months</td><td>Rotarix</td><td>Rotavirus</td></tr>
+  <tr><td>2, 4, 12 months</td><td>Prevenar 13</td><td>Pneumococcal disease</td></tr>
+  <tr><td>12 months</td><td>Priorix + Nimenrix</td><td>MMR + Meningococcal ACWY</td></tr>
+  <tr><td>18 months</td><td>Priorix-Tetra</td><td>MMRV (Measles, Mumps, Rubella, Varicella)</td></tr>
+  <tr><td>4 years</td><td>Infanrix IPV + Priorix</td><td>DTPa-IPV booster + MMR dose 2</td></tr>
+</table>
+
+<p>
+  Adult vaccinations in the dataset include COVID-19 (Comirnaty, Spikevax), influenza
+  (Fluarix Tetra), HPV (Gardasil 9), pertussis boosters (Boostrix), shingles (Shingrix),
+  and pneumococcal (Pneumovax 23).
+</p>
+
+<!-- ================================================================== -->
+<!--  3. SYNTHETIC DATASET                                              -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">3. Synthetic Dataset</h2>
+
+<p>
+  Since real AIR data is protected health information, this demo uses a <strong>realistic
+  synthetic dataset</strong> generated to mirror the structure, volumes, and data quality
+  characteristics of real AIR extracts.
+</p>
+
+<h3>Data volumes</h3>
+
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="value">100,000</div>
+    <div class="label">Patients</div>
+  </div>
+  <div class="kpi-card">
+    <div class="value">2,000</div>
+    <div class="label">Providers</div>
+  </div>
+  <div class="kpi-card">
+    <div class="value">751,000+</div>
+    <div class="label">Vaccination Records</div>
+  </div>
+  <div class="kpi-card">
+    <div class="value">~188 MB</div>
+    <div class="label">Total CSV Size</div>
+  </div>
+</div>
+
+<h3>Source files</h3>
+
+<table>
+  <tr><th>File</th><th>Records</th><th>Size</th><th>Description</th></tr>
+  <tr>
+    <td><code>patients.csv</code></td>
+    <td>100,000</td>
+    <td>~18 MB</td>
+    <td>Patient demographics — Medicare number, name, DOB, gender, Indigenous status, address, state, postcode</td>
+  </tr>
+  <tr>
+    <td><code>providers.csv</code></td>
+    <td>2,000</td>
+    <td>~275 KB</td>
+    <td>Vaccination provider details — provider number, type, practice name, location</td>
+  </tr>
+  <tr>
+    <td><code>vaccinations.csv</code></td>
+    <td>~751,000</td>
+    <td>~170 MB</td>
+    <td>Individual vaccination events — vaccine brand, antigen, dose number, dates, batch, site, funding</td>
+  </tr>
+</table>
+
+<h3>Realistic characteristics</h3>
+
+<h4>Australian demographics</h4>
+<ul>
+  <li><strong>State distribution</strong> weighted to match Australian population: NSW 32%, VIC 26%, QLD 20%, WA 10%, SA 7%, TAS 2%, ACT 2%, NT 1%</li>
+  <li><strong>Gender split</strong>: 49% Male, 49% Female, 2% Other/Indeterminate</li>
+  <li><strong>Indigenous status</strong>: ~3% Aboriginal, ~1% Torres Strait Islander, ~0.5% Both — matching ABS population estimates</li>
+  <li><strong>Names</strong>: Top 30 Australian baby names (2023 ABS data) for each gender</li>
+  <li><strong>Postcodes</strong>: Valid ranges per state (e.g. NSW 2000-2899, VIC 3000-3899)</li>
+</ul>
+
+<h4>Vaccination patterns</h4>
+<ul>
+  <li><strong>Children (~60%)</strong>: Follow the NIP schedule with realistic compliance rates (~85-95% fully immunised)</li>
+  <li><strong>Adults (~40%)</strong>: Random selection of adult vaccines (COVID-19, influenza, HPV, shingles, etc.) with 0-6 doses per person</li>
+  <li><strong>Provider matching</strong>: Patients are preferentially matched to providers in the same state</li>
+</ul>
+
+<h4>Deliberate data quality issues (~3% of records)</h4>
+<p>Real-world data is messy. The synthetic data includes intentional quality issues to demonstrate the value of the silver cleansing layer:</p>
+
+<table>
+  <tr><th>Issue Type</th><th>Probability</th><th>Example</th></tr>
+  <tr><td><strong>Null values</strong></td><td>~0.75%</td><td>Missing first name, empty date of birth</td></tr>
+  <tr><td><strong>Date format mismatches</strong></td><td>~0.75%</td><td><code>14/04/2026</code> instead of <code>2026-04-14</code>, or <code>04-14-2026</code></td></tr>
+  <tr><td><strong>Typos</strong></td><td>~0.75%</td><td><code>Olxver</code> instead of <code>Oliver</code></td></tr>
+  <tr><td><strong>Extra whitespace</strong></td><td>~0.75%</td><td><code>Charlotte&nbsp;&nbsp;Smith</code> with double spaces</td></tr>
+  <tr><td><strong>Duplicate records</strong></td><td>~1%</td><td>Same vaccination reported twice with slightly different reporting dates</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!--  4. ARCHITECTURE                                                   -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">4. Architecture Overview</h2>
+
+<p>
+  The demo implements a <strong>medallion architecture</strong> (bronze → silver → gold)
+  using Snowflake Dynamic Tables for automated pipeline orchestration. Everything runs
+  inside the Snowflake platform — no external tools required.
+</p>
+
+<div style="margin:20px 0; page-break-inside:avoid;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" style="border-radius:12px;">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0F1B2D"/>
+      <stop offset="100%" stop-color="#162337"/>
+    </linearGradient>
+    <linearGradient id="sourceGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#374151"/>
+      <stop offset="100%" stop-color="#1F2937"/>
+    </linearGradient>
+    <linearGradient id="bronzeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#92400E"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+    <linearGradient id="silverGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A16207"/>
+      <stop offset="100%" stop-color="#854D0E"/>
+    </linearGradient>
+    <linearGradient id="appGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1D4ED8"/>
+      <stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <linearGradient id="snowGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#29B5E8"/>
+      <stop offset="100%" stop-color="#11A3D0"/>
+    </linearGradient>
+    <marker id="arrowWhite" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowCyan" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#29B5E8"/>
+    </marker>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="820" fill="url(#bgGrad)" rx="0"/>
+
+  <text x="600" y="48" text-anchor="middle" fill="#F1F5F9" font-size="22" font-weight="700" letter-spacing="0.5" font-family="Segoe UI, system-ui, sans-serif">Australian Immunisation Register — Snowflake Architecture</text>
+  <text x="600" y="72" text-anchor="middle" fill="#64748B" font-size="13" font-family="Segoe UI, system-ui, sans-serif">Medallion Architecture  ·  Dynamic Tables  ·  Zero Orchestration</text>
+
+  <rect x="260" y="95" width="920" height="700" rx="16" fill="none" stroke="#29B5E8" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.35"/>
+  <rect x="270" y="86" width="180" height="24" rx="4" fill="#0F1B2D"/>
+  <text x="360" y="102" text-anchor="middle" fill="#29B5E8" font-size="12" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">SNOWFLAKE PLATFORM</text>
+
+  <g filter="url(#shadow)">
+    <rect x="30" y="240" width="200" height="320" rx="12" fill="url(#sourceGrad)" stroke="#4B5563" stroke-width="1"/>
+  </g>
+  <text x="130" y="272" text-anchor="middle" fill="#E5E7EB" font-size="14" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">SOURCE</text>
+  <text x="130" y="290" text-anchor="middle" fill="#9CA3AF" font-size="11" font-family="Segoe UI, system-ui, sans-serif">AIR CSV Extracts</text>
+  <line x1="55" y1="302" x2="205" y2="302" stroke="#4B5563" stroke-width="0.5"/>
+  <g transform="translate(55, 315)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500" font-family="Segoe UI, system-ui, sans-serif">patients.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9" font-family="Segoe UI, system-ui, sans-serif">100K records</text>
+  </g>
+  <g transform="translate(55, 362)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500" font-family="Segoe UI, system-ui, sans-serif">providers.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9" font-family="Segoe UI, system-ui, sans-serif">2K records</text>
+  </g>
+  <g transform="translate(55, 409)">
+    <rect width="150" height="36" rx="6" fill="#1F2937" stroke="#6B7280" stroke-width="0.5"/>
+    <text x="14" y="23" fill="#FCD34D" font-size="16">📄</text>
+    <text x="38" y="20" fill="#D1D5DB" font-size="12" font-weight="500" font-family="Segoe UI, system-ui, sans-serif">vaccinations.csv</text>
+    <text x="38" y="32" fill="#6B7280" font-size="9" font-family="Segoe UI, system-ui, sans-serif">751K records</text>
+  </g>
+  <g transform="translate(55, 468)">
+    <rect width="150" height="30" rx="6" fill="#1E3A5F" stroke="#3B82F6" stroke-width="0.5"/>
+    <text x="14" y="20" fill="#60A5FA" font-size="12">🐍</text>
+    <text x="36" y="20" fill="#93C5FD" font-size="10" font-family="Segoe UI, system-ui, sans-serif">Synthetic data gen</text>
+  </g>
+
+  <line x1="230" y1="400" x2="290" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+  <text x="260" y="390" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">PUT +</text>
+  <text x="260" y="400" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">COPY</text>
+  <text x="260" y="410" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">INTO</text>
+
+  <g filter="url(#shadow)">
+    <rect x="300" y="200" width="190" height="400" rx="12" fill="url(#bronzeGrad)" stroke="#B45309" stroke-width="1"/>
+  </g>
+  <text x="395" y="232" text-anchor="middle" fill="#FEF3C7" font-size="15" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">BRONZE</text>
+  <text x="395" y="250" text-anchor="middle" fill="#FDE68A" font-size="10" opacity="0.8" font-family="Segoe UI, system-ui, sans-serif">Raw / As-Is</text>
+  <line x1="320" y1="260" x2="470" y2="260" stroke="#B45309" stroke-width="0.5"/>
+  <g transform="translate(318, 275)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">RAW_PATIENTS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9" font-family="Segoe UI, system-ui, sans-serif">STRING dates, as-received</text>
+  </g>
+  <g transform="translate(318, 330)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">RAW_PROVIDERS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Untrimmed, raw format</text>
+  </g>
+  <g transform="translate(318, 385)">
+    <rect width="154" height="44" rx="6" fill="#78350F" stroke="#B45309" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FDE68A" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">RAW_VACCINATIONS</text>
+    <text x="12" y="34" fill="#D97706" font-size="9" font-family="Segoe UI, system-ui, sans-serif">~751K rows inc. dupes</text>
+  </g>
+  <g transform="translate(318, 450)">
+    <rect width="154" height="36" rx="6" fill="#451A03" stroke="#92400E" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="12" y="16" fill="#FBBF24" font-size="9" font-family="Segoe UI, system-ui, sans-serif">+ _loaded_at</text>
+    <text x="12" y="30" fill="#FBBF24" font-size="9" font-family="Segoe UI, system-ui, sans-serif">+ _source_file</text>
+  </g>
+  <g transform="translate(330, 510)">
+    <rect width="130" height="22" rx="4" fill="#451A03" stroke="#B45309" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#FDE68A" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">COPY INTO  ·  Stage</text>
+  </g>
+
+  <line x1="490" y1="400" x2="540" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="550" y="120" width="200" height="560" rx="12" fill="url(#silverGrad)" stroke="#64748B" stroke-width="1"/>
+  </g>
+  <text x="650" y="152" text-anchor="middle" fill="#E2E8F0" font-size="15" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">SILVER</text>
+  <text x="650" y="170" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="Segoe UI, system-ui, sans-serif">Cleansed / Conformed</text>
+  <line x1="570" y1="180" x2="730" y2="180" stroke="#64748B" stroke-width="0.5"/>
+  <g transform="translate(580, 190)">
+    <rect width="140" height="20" rx="10" fill="#29B5E8" opacity="0.15" stroke="#29B5E8" stroke-width="0.5"/>
+    <text x="70" y="14" text-anchor="middle" fill="#29B5E8" font-size="9" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">⚡ DYNAMIC TABLES</text>
+  </g>
+  <g transform="translate(568, 222)">
+    <rect width="164" height="52" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">PATIENTS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Parsed DOB, age groups</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Indigenous flag, INITCAP</text>
+  </g>
+  <g transform="translate(568, 284)">
+    <rect width="164" height="44" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">PROVIDERS</text>
+    <text x="12" y="34" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Standardised, trimmed</text>
+  </g>
+  <g transform="translate(568, 338)">
+    <rect width="164" height="52" rx="6" fill="#1E293B" stroke="#64748B" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#E2E8F0" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">VACCINATIONS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Deduplicated (ROW_NUMBER)</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Parsed dates, typed doses</text>
+  </g>
+  <g transform="translate(568, 402)">
+    <rect width="164" height="58" rx="6" fill="#1E293B" stroke="#38BDF8" stroke-width="1"/>
+    <text x="12" y="18" fill="#38BDF8" font-size="11" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">VACCINATION_EVENTS</text>
+    <text x="12" y="32" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Enriched fact table</text>
+    <text x="12" y="44" fill="#94A3B8" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Patient + Provider joined</text>
+  </g>
+  <g transform="translate(568, 480)">
+    <rect width="164" height="110" rx="6" fill="#0F172A" stroke="#475569" stroke-width="0.5" stroke-dasharray="3 2"/>
+    <text x="12" y="18" fill="#94A3B8" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Transformations:</text>
+    <text x="16" y="34" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ TRY_TO_DATE parsing</text>
+    <text x="16" y="48" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ INITCAP / TRIM / UPPER</text>
+    <text x="16" y="62" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ ROW_NUMBER dedup</text>
+    <text x="16" y="76" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ Age group derivation</text>
+    <text x="16" y="90" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ Reporting lag calc</text>
+    <text x="16" y="104" fill="#67E8F9" font-size="9" font-family="Segoe UI, system-ui, sans-serif">✓ NULL / empty handling</text>
+  </g>
+  <g transform="translate(585, 606)">
+    <rect width="130" height="22" rx="4" fill="#0F172A" stroke="#64748B" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">TARGET_LAG = 1 hour</text>
+  </g>
+
+  <line x1="750" y1="400" x2="800" y2="400" stroke="#94A3B8" stroke-width="2" marker-end="url(#arrowWhite)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="810" y="120" width="200" height="480" rx="12" fill="url(#goldGrad)" stroke="#CA8A04" stroke-width="1"/>
+  </g>
+  <text x="910" y="152" text-anchor="middle" fill="#FEF9C3" font-size="15" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">GOLD</text>
+  <text x="910" y="170" text-anchor="middle" fill="#FDE68A" font-size="10" opacity="0.8" font-family="Segoe UI, system-ui, sans-serif">Analytics-Ready</text>
+  <line x1="830" y1="180" x2="990" y2="180" stroke="#CA8A04" stroke-width="0.5"/>
+  <g transform="translate(840, 190)">
+    <rect width="140" height="20" rx="10" fill="#29B5E8" opacity="0.15" stroke="#29B5E8" stroke-width="0.5"/>
+    <text x="70" y="14" text-anchor="middle" fill="#29B5E8" font-size="9" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">⚡ DYNAMIC TABLES</text>
+  </g>
+  <g transform="translate(828, 222)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">COVERAGE_BY_STATE_AGE</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Coverage rates, targets</text>
+  </g>
+  <g transform="translate(828, 276)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">MONTHLY_VAX_TRENDS</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Volume, patients, lag</text>
+  </g>
+  <g transform="translate(828, 330)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">PROVIDER_PERFORMANCE</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Activity, timeliness, NIP %</text>
+  </g>
+  <g transform="translate(828, 384)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">DATA_QUALITY_SUMMARY</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9" font-family="Segoe UI, system-ui, sans-serif">Parse failures, cleansing</text>
+  </g>
+  <g transform="translate(828, 438)">
+    <rect width="164" height="44" rx="6" fill="#713F12" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="12" y="18" fill="#FEF9C3" font-size="10" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">CHILDHOOD_MILESTONES</text>
+    <text x="12" y="34" fill="#EAB308" font-size="9" font-family="Segoe UI, system-ui, sans-serif">1yr, 2yr, 5yr coverage</text>
+  </g>
+  <g transform="translate(845, 504)">
+    <rect width="130" height="22" rx="4" fill="#451A03" stroke="#CA8A04" stroke-width="0.5"/>
+    <text x="65" y="15" text-anchor="middle" fill="#FDE68A" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">TARGET_LAG = 1 hour</text>
+  </g>
+
+  <line x1="910" y1="605" x2="910" y2="650" stroke="#29B5E8" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="560" y="660" width="580" height="120" rx="14" fill="url(#appGrad)" stroke="#3B82F6" stroke-width="1.5"/>
+  </g>
+  <text x="600" y="700" fill="#FFFFFF" font-size="28">📊</text>
+  <text x="640" y="695" fill="#FFFFFF" font-size="16" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">Streamlit in Snowflake</text>
+  <text x="640" y="714" fill="#BFDBFE" font-size="11" font-family="Segoe UI, system-ui, sans-serif">No separate app server — runs inside Snowflake</text>
+  <g transform="translate(580, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Overview</text>
+  </g>
+  <g transform="translate(668, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Coverage</text>
+  </g>
+  <g transform="translate(756, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Trends</text>
+  </g>
+  <g transform="translate(844, 726)">
+    <rect width="80" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="40" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Providers</text>
+  </g>
+  <g transform="translate(932, 726)">
+    <rect width="86" height="22" rx="11" fill="#2563EB" stroke="#60A5FA" stroke-width="0.5"/>
+    <text x="43" y="15" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">Data Quality</text>
+  </g>
+
+  <path d="M 650 600 L 650 640 Q 650 660 670 660 L 700 660" fill="none" stroke="#29B5E8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowCyan)" opacity="0.5"/>
+
+  <g transform="translate(1020, 120)">
+    <rect width="140" height="70" rx="10" fill="#0F172A" stroke="#29B5E8" stroke-width="1" filter="url(#shadow)"/>
+    <text x="70" y="22" text-anchor="middle" fill="#29B5E8" font-size="12" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">⚡ WAREHOUSE</text>
+    <text x="70" y="40" text-anchor="middle" fill="#E2E8F0" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">AIR_DEMO_WH</text>
+    <text x="70" y="56" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="Segoe UI, system-ui, sans-serif">X-Small · Auto-suspend 60s</text>
+  </g>
+  <g transform="translate(1020, 210)">
+    <rect width="140" height="48" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="1"/>
+    <text x="70" y="20" text-anchor="middle" fill="#6EE7B7" font-size="10" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">💰 COST ESTIMATE</text>
+    <text x="70" y="38" text-anchor="middle" fill="#A7F3D0" font-size="13" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">~$0.50 / run</text>
+  </g>
+  <g transform="translate(1020, 280)">
+    <rect width="140" height="110" rx="8" fill="#1E1B4B" stroke="#818CF8" stroke-width="1"/>
+    <text x="70" y="18" text-anchor="middle" fill="#C7D2FE" font-size="9" font-weight="700" font-family="Segoe UI, system-ui, sans-serif">VS DATABRICKS</text>
+    <line x1="20" y1="24" x2="120" y2="24" stroke="#4338CA" stroke-width="0.5"/>
+    <text x="14" y="40" fill="#E0E7FF" font-size="8.5" font-family="Segoe UI, system-ui, sans-serif">✗ Cluster spin-up</text>
+    <text x="14" y="54" fill="#E0E7FF" font-size="8.5" font-family="Segoe UI, system-ui, sans-serif">✗ Spark configuration</text>
+    <text x="14" y="68" fill="#E0E7FF" font-size="8.5" font-family="Segoe UI, system-ui, sans-serif">✗ Delta Lake setup</text>
+    <text x="14" y="82" fill="#E0E7FF" font-size="8.5" font-family="Segoe UI, system-ui, sans-serif">✗ Airflow / scheduling</text>
+    <text x="14" y="96" fill="#E0E7FF" font-size="8.5" font-family="Segoe UI, system-ui, sans-serif">✗ Separate BI tool</text>
+  </g>
+
+  <text x="600" y="810" text-anchor="middle" fill="#475569" font-size="10" font-family="Segoe UI, system-ui, sans-serif">Australian Immunisation Register · Synthetic Data Demo · Snowflake 2026</text>
+</svg>
+</div>
+
+<h3>Snowflake objects created</h3>
+
+<table>
+  <tr><th>Object</th><th>Schema</th><th>Type</th><th>Purpose</th></tr>
+  <tr><td><code>AIR_DEMO_WH</code></td><td>—</td><td>Warehouse</td><td>X-Small compute (auto-suspend 60s, auto-resume)</td></tr>
+  <tr><td><code>AIR_DEMO</code></td><td>—</td><td>Database</td><td>Container for all demo objects</td></tr>
+  <tr><td><code>AIR_LANDING</code></td><td>BRONZE</td><td>Internal Stage</td><td>Landing zone for uploaded CSV files</td></tr>
+  <tr><td><code>CSV_FORMAT</code></td><td>BRONZE</td><td>File Format</td><td>CSV parsing configuration</td></tr>
+  <tr><td><code>RAW_PATIENTS</code></td><td>BRONZE</td><td>Table</td><td>Raw patient data (all STRING columns)</td></tr>
+  <tr><td><code>RAW_PROVIDERS</code></td><td>BRONZE</td><td>Table</td><td>Raw provider data (all STRING columns)</td></tr>
+  <tr><td><code>RAW_VACCINATIONS</code></td><td>BRONZE</td><td>Table</td><td>Raw vaccination events (all STRING columns)</td></tr>
+  <tr><td><code>PATIENTS</code></td><td>SILVER</td><td>Dynamic Table</td><td>Cleansed patient demographics</td></tr>
+  <tr><td><code>PROVIDERS</code></td><td>SILVER</td><td>Dynamic Table</td><td>Standardised provider reference data</td></tr>
+  <tr><td><code>VACCINATIONS</code></td><td>SILVER</td><td>Dynamic Table</td><td>Deduplicated, parsed vaccination records</td></tr>
+  <tr><td><code>VACCINATION_EVENTS</code></td><td>SILVER</td><td>Dynamic Table</td><td>Enriched fact table (vax + patient + provider)</td></tr>
+  <tr><td><code>COVERAGE_BY_STATE_AGE</code></td><td>GOLD</td><td>Dynamic Table</td><td>Coverage rates by state, age group, Indigenous status</td></tr>
+  <tr><td><code>MONTHLY_VACCINATION_TRENDS</code></td><td>GOLD</td><td>Dynamic Table</td><td>Monthly volumes, unique patients, reporting lag</td></tr>
+  <tr><td><code>PROVIDER_PERFORMANCE</code></td><td>GOLD</td><td>Dynamic Table</td><td>Provider activity, timeliness, NIP-funded percentage</td></tr>
+  <tr><td><code>DATA_QUALITY_SUMMARY</code></td><td>GOLD</td><td>Dynamic Table</td><td>Parse failure counts and percentages</td></tr>
+  <tr><td><code>CHILDHOOD_COVERAGE_MILESTONES</code></td><td>GOLD</td><td>Dynamic Table</td><td>1yr, 2yr, 5yr coverage (matches AIR reporting)</td></tr>
+  <tr><td><code>AIR_DASHBOARD</code></td><td>APP</td><td>Streamlit App</td><td>Interactive analytics dashboard</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!--  5. BRONZE LAYER                                                   -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">5. Pipeline Detail: Bronze Layer</h2>
+
+<p>
+  The bronze layer preserves <strong>source fidelity</strong> — all columns are stored as
+  <code>STRING</code> type exactly as received. No transformations, no parsing, no data loss.
+  This is the immutable record of what was received from the source system.
+</p>
+
+<h3>Key design decisions</h3>
+<ul>
+  <li><strong>All STRING columns</strong> — Dates remain as strings (<code>"2026-04-14"</code>, <code>"14/04/2026"</code>, etc.) so no data is lost during ingestion. Parsing happens in the silver layer.</li>
+  <li><strong>Metadata columns</strong> — <code>_loaded_at</code> (TIMESTAMP) captures when each record was ingested.</li>
+  <li><strong>ON_ERROR = 'CONTINUE'</strong> — Ingestion continues past malformed rows rather than failing the entire load.</li>
+  <li><strong>PATTERN matching</strong> — COPY INTO uses file name patterns (<code>.*patients.*</code>) so files can be uploaded in any order.</li>
+</ul>
+
+<h3>Technology used</h3>
+<table>
+  <tr><th>Component</th><th>Snowflake Feature</th></tr>
+  <tr><td>File upload</td><td>Internal Stage (<code>AIR_LANDING</code>) — upload via Snowsight UI</td></tr>
+  <tr><td>File format</td><td>Named File Format (<code>CSV_FORMAT</code>) — reusable, version-controlled</td></tr>
+  <tr><td>Data loading</td><td><code>COPY INTO</code> — bulk load with pattern matching</td></tr>
+</table>
+
+<!-- ================================================================== -->
+<!--  6. SILVER LAYER                                                   -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">6. Pipeline Detail: Silver Layer</h2>
+
+<p>
+  The silver layer <strong>cleanses, conforms, deduplicates, and enriches</strong> the raw
+  data. All four silver tables are <strong>Dynamic Tables</strong> — they are defined as
+  declarative SQL queries and Snowflake automatically keeps them up to date.
+</p>
+
+<div class="box box-blue">
+  <strong>What are Dynamic Tables?</strong>
+  Dynamic Tables are Snowflake's declarative data pipeline feature. You write a SQL query
+  that defines the target state of the table, set a <code>TARGET_LAG</code> (e.g. 1 hour),
+  and Snowflake handles all the scheduling, dependency tracking, and incremental refresh
+  automatically. No Airflow. No cron jobs. No Spark.
+</div>
+
+<h3>SILVER.PATIENTS</h3>
+<table>
+  <tr><th>Transformation</th><th>Detail</th></tr>
+  <tr><td>Date parsing</td><td><code>TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD')</code> — safely parses dates, returns NULL on failure</td></tr>
+  <tr><td>Name standardisation</td><td><code>INITCAP(TRIM(first_name))</code> — removes whitespace, capitalises correctly</td></tr>
+  <tr><td>Age calculation</td><td><code>DATEDIFF('year', dob, CURRENT_DATE())</code> — computed age in years and months</td></tr>
+  <tr><td>Age grouping</td><td>Derived categories: Infant, Toddler, Preschool, Child, Adolescent, Adult, Senior</td></tr>
+  <tr><td>Indigenous flag</td><td>Boolean <code>is_indigenous</code> derived from status text values</td></tr>
+  <tr><td>Quality flag</td><td><code>dob_parse_failed</code> boolean — tracks which records had unparseable dates</td></tr>
+</table>
+
+<h3>SILVER.PROVIDERS</h3>
+<p>Standardised and trimmed provider reference data with full name concatenation.</p>
+
+<h3>SILVER.VACCINATIONS</h3>
+<table>
+  <tr><th>Transformation</th><th>Detail</th></tr>
+  <tr><td>Deduplication</td><td><code>ROW_NUMBER()</code> windowing — partitioned by patient, antigen, dose, date. Keeps latest record.</td></tr>
+  <tr><td>Date parsing</td><td>Administration and reporting dates parsed with <code>TRY_TO_DATE</code></td></tr>
+  <tr><td>Reporting lag</td><td><code>DATEDIFF('day', admin_date, reporting_date)</code> — measures provider reporting timeliness</td></tr>
+  <tr><td>Type casting</td><td>Dose number cast from STRING to INTEGER via <code>TRY_CAST</code></td></tr>
+</table>
+
+<h3>SILVER.VACCINATION_EVENTS</h3>
+<p>
+  The main <strong>enriched fact table</strong> — joins vaccinations with patient demographics
+  and provider details. This single table powers most of the gold layer and dashboard queries.
+  Records with unparseable administration dates are excluded.
+</p>
+
+<!-- ================================================================== -->
+<!--  7. GOLD LAYER                                                     -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">7. Pipeline Detail: Gold Layer</h2>
+
+<p>
+  The gold layer contains <strong>analytics-ready aggregates</strong> — pre-computed metrics
+  that the Streamlit dashboard queries directly. All five tables are Dynamic Tables with a
+  1-hour target lag.
+</p>
+
+<h3>GOLD.COVERAGE_BY_STATE_AGE</h3>
+<p>
+  The core immunisation coverage metric. Calculates the percentage of patients who have
+  received 3+ distinct antigens, broken down by state, age group, and Indigenous status.
+  This mirrors how the real AIR reports national coverage statistics.
+</p>
+
+<h3>GOLD.MONTHLY_VACCINATION_TRENDS</h3>
+<p>
+  Monthly time series showing dose volumes, unique patients vaccinated, active provider
+  counts, and average reporting lag — grouped by state, antigen, and NIP funding status.
+</p>
+
+<h3>GOLD.PROVIDER_PERFORMANCE</h3>
+<p>
+  Per-provider activity metrics: total doses administered, unique patients served,
+  vaccine diversity, reporting timeliness (average lag, late report count), and
+  NIP-funded percentage.
+</p>
+
+<h3>GOLD.DATA_QUALITY_SUMMARY</h3>
+<p>
+  Pipeline health metrics showing date parse failure counts and percentages for both
+  patients and vaccinations — demonstrating the value of the bronze→silver cleansing pipeline.
+</p>
+
+<h3>GOLD.CHILDHOOD_COVERAGE_MILESTONES</h3>
+<p>
+  Coverage rates at the key AIR reporting milestones: 1 year, 2 years, and 5 years of age.
+  Compares against the national 95% aspirational target and calculates the gap,
+  broken down by state and Indigenous status.
+</p>
+
+<!-- ================================================================== -->
+<!--  8. STREAMLIT DASHBOARD                                            -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">8. Streamlit Dashboard</h2>
+
+<p>
+  The dashboard is a <strong>Streamlit in Snowflake</strong> application — it runs inside
+  Snowflake with no separate app server, no infrastructure to manage, and no data leaving
+  the platform.
+</p>
+
+<h3>Dashboard tabs</h3>
+
+<table>
+  <tr><th>Tab</th><th>Contents</th></tr>
+  <tr>
+    <td><strong>Overview</strong></td>
+    <td>
+      KPI cards (patients, providers, vaccinations, duplicates removed).<br>
+      Bar charts: vaccinations by state and by age group.<br>
+      Table: top 10 vaccines administered.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Coverage</strong></td>
+    <td>
+      National coverage rate vs 95% target with sidebar filters (state, age group, Indigenous status).<br>
+      Coverage by state and by age group bar charts.<br>
+      Detailed data table with progress bar column for coverage percentage.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Trends</strong></td>
+    <td>
+      Monthly doses administered (area chart).<br>
+      Monthly unique patients (line chart).<br>
+      Doses by antigen over time (multi-line chart).<br>
+      Average reporting lag (bar chart) with 10-day target reference.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Providers</strong></td>
+    <td>
+      Provider KPIs (count, average reporting lag, late reports).<br>
+      Doses by provider type. NIP-funded rate by provider type.<br>
+      Sortable top providers table with progress bar for NIP-funded percentage.
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Data Quality</strong></td>
+    <td>
+      Parse failure metrics for patients and vaccinations.<br>
+      Pipeline architecture summary table.<br>
+      Snowflake advantages checklist.<br>
+      Live Dynamic Table refresh status from <code>INFORMATION_SCHEMA</code>.
+    </td>
+  </tr>
+</table>
+
+<h3>Technical features</h3>
+<ul>
+  <li><code>st.connection("snowflake")</code> — native Snowflake connector, no credentials needed</li>
+  <li><code>@st.cache_data(ttl=10min)</code> — query caching for responsive UI</li>
+  <li><code>st.metric(border=True)</code> — bordered KPI cards</li>
+  <li><code>st.container(horizontal=True)</code> — horizontal KPI row layout</li>
+  <li><code>st.column_config.ProgressColumn</code> — visual progress bars in data tables</li>
+  <li>Material Design icons for tab headers</li>
+</ul>
+
+<!-- ================================================================== -->
+<!--  9. DEPLOYMENT GUIDE                                               -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">9. Deployment Guide</h2>
+
+<div class="box box-green">
+  <strong>No installs required</strong>
+  Everything is done through the Snowsight web UI. No CLI, no Python, no batch files.
+  Just a browser and a Snowflake account.
+</div>
+
+<p>Estimated time: <strong>20-30 minutes</strong> (mostly waiting for file uploads and Dynamic Table refreshes).</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h4>Setup environment &amp; bronze tables</h4>
+    <ol>
+      <li>Log into <strong>Snowsight</strong></li>
+      <li>Open <strong>Projects &gt; Worksheets</strong> and create a new SQL worksheet</li>
+      <li>Open <code>scripts/01_setup_bronze.sql</code> from the repository and paste the entire contents into the worksheet</li>
+      <li>Click <strong>Run All</strong> (Ctrl+Shift+Enter)</li>
+      <li><strong>Stop</strong> when you reach the "STOP HERE" comment — you need to upload files next</li>
+    </ol>
+    <p>This creates: warehouse (<code>AIR_DEMO_WH</code>), database (<code>AIR_DEMO</code>), four schemas, file format, stage, and three bronze tables.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h4>Upload CSV files to stage</h4>
+    <ol>
+      <li>In the left sidebar, navigate to <strong>Data &gt; Databases &gt; AIR_DEMO &gt; BRONZE &gt; Stages &gt; AIR_LANDING</strong></li>
+      <li>Click the <strong>+ Files</strong> button</li>
+      <li>Upload all three files from the <code>data/</code> folder:
+        <ul>
+          <li><code>patients.csv</code> (~18 MB)</li>
+          <li><code>providers.csv</code> (~275 KB)</li>
+          <li><code>vaccinations.csv</code> (~170 MB — this one takes a minute)</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h4>Load data into bronze tables</h4>
+    <ol>
+      <li>Go back to your worksheet from Step 1</li>
+      <li>Select and run the <strong>COPY INTO</strong> statements (everything after the "STOP HERE" comment)</li>
+      <li>The validation query at the bottom should show:
+        <ul>
+          <li><code>RAW_PATIENTS</code>: ~100,000 rows</li>
+          <li><code>RAW_PROVIDERS</code>: ~2,000 rows</li>
+          <li><code>RAW_VACCINATIONS</code>: ~751,000 rows</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h4>Create silver Dynamic Tables</h4>
+    <ol>
+      <li>Open a new worksheet (or clear the current one)</li>
+      <li>Paste the contents of <code>scripts/02_silver_dynamic_tables.sql</code></li>
+      <li>Click <strong>Run All</strong></li>
+    </ol>
+    <p>Creates 4 Dynamic Tables: <code>PATIENTS</code>, <code>PROVIDERS</code>, <code>VACCINATIONS</code>, <code>VACCINATION_EVENTS</code></p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h4>Create gold Dynamic Tables</h4>
+    <ol>
+      <li>Paste the contents of <code>scripts/03_gold_dynamic_tables.sql</code></li>
+      <li>Click <strong>Run All</strong></li>
+    </ol>
+    <p>Creates 5 analytics tables: coverage, trends, provider performance, data quality, childhood milestones.</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">6</div>
+  <div class="step-body">
+    <h4>Trigger initial refresh</h4>
+    <ol>
+      <li>Paste the contents of <code>scripts/05_manual_refresh.sql</code></li>
+      <li>Click <strong>Run All</strong></li>
+    </ol>
+    <p>This forces all 9 Dynamic Tables to compute immediately. The verification query at the bottom shows row counts for every table.</p>
+    <div class="box box-amber">
+      <strong>Note</strong>
+      If you skip this step, the Dynamic Tables will still refresh automatically — they just
+      might take up to 1 hour (the configured <code>TARGET_LAG</code>).
+    </div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">7</div>
+  <div class="step-body">
+    <h4>Deploy the Streamlit dashboard</h4>
+    <ol>
+      <li>Open a new worksheet</li>
+      <li>Paste the contents of <code>scripts/04_deploy_streamlit.sql</code></li>
+      <li>Run the <strong>first part</strong> (up to the "STOP HERE" comment) to create the Streamlit stage</li>
+      <li>Navigate to <strong>Data &gt; Databases &gt; AIR_DEMO &gt; APP &gt; Stages &gt; STREAMLIT_STAGE</strong></li>
+      <li>Click <strong>+ Files</strong> and upload <code>streamlit/streamlit_app.py</code></li>
+      <li>Go back to the worksheet and run the <strong>CREATE STREAMLIT</strong> statement</li>
+      <li>Navigate to <strong>Projects &gt; Streamlit</strong> — click <strong>AIR_DASHBOARD</strong> to open it</li>
+    </ol>
+  </div>
+</div>
+
+<div class="box box-green">
+  <strong>Done!</strong>
+  The dashboard is live. All data pipelines are automated. Dynamic Tables will continue
+  refreshing on their 1-hour schedule — if new data is loaded into the bronze tables,
+  everything downstream updates automatically.
+</div>
+
+<!-- ================================================================== -->
+<!--  10. SNOWFLAKE VS DATABRICKS                                       -->
+<!-- ================================================================== -->
+
+<h2 class="section-break">10. Snowflake vs Databricks</h2>
+
+<p>
+  This demo is purpose-built to highlight the operational simplicity of Snowflake compared
+  to a Databricks implementation of the same pipeline.
+</p>
+
+<table>
+  <tr>
+    <th style="width:30%">Capability</th>
+    <th style="width:35%"><span class="compare-sf">Snowflake (this demo)</span></th>
+    <th style="width:35%"><span class="compare-db">Databricks equivalent</span></th>
+  </tr>
+  <tr>
+    <td><strong>Compute</strong></td>
+    <td><span class="check">&#10003;</span> X-Small warehouse, auto-suspend 60s, instant resume</td>
+    <td><span class="cross">&#10007;</span> Cluster provisioning, spin-up time (2-5 min), DBU pricing</td>
+  </tr>
+  <tr>
+    <td><strong>Data ingestion</strong></td>
+    <td><span class="check">&#10003;</span> <code>COPY INTO</code> from stage — one SQL command</td>
+    <td><span class="cross">&#10007;</span> Auto Loader or COPY INTO with Delta Lake configuration</td>
+  </tr>
+  <tr>
+    <td><strong>Pipeline orchestration</strong></td>
+    <td><span class="check">&#10003;</span> Dynamic Tables — zero config, declarative SQL</td>
+    <td><span class="cross">&#10007;</span> Delta Live Tables + Workflows (or external Airflow)</td>
+  </tr>
+  <tr>
+    <td><strong>Storage format</strong></td>
+    <td><span class="check">&#10003;</span> Managed automatically — no format decisions</td>
+    <td><span class="cross">&#10007;</span> Delta Lake setup, compaction, Z-ordering</td>
+  </tr>
+  <tr>
+    <td><strong>Language</strong></td>
+    <td><span class="check">&#10003;</span> Pure SQL — accessible to any analyst</td>
+    <td><span class="cross">&#10007;</span> PySpark notebooks (requires Python/Spark skills)</td>
+  </tr>
+  <tr>
+    <td><strong>Dashboard</strong></td>
+    <td><span class="check">&#10003;</span> Streamlit in Snowflake — built-in, no extra cost</td>
+    <td><span class="cross">&#10007;</span> Separate BI tool (Tableau, Power BI) or Databricks SQL dashboards</td>
+  </tr>
+  <tr>
+    <td><strong>Governance</strong></td>
+    <td><span class="check">&#10003;</span> Built-in RBAC, masking, lineage, column-level security</td>
+    <td><span class="cross">&#10007;</span> Unity Catalog setup required (separate configuration)</td>
+  </tr>
+  <tr>
+    <td><strong>Deployment</strong></td>
+    <td><span class="check">&#10003;</span> Copy-paste SQL into Snowsight. Done.</td>
+    <td><span class="cross">&#10007;</span> Workspace setup, cluster policies, notebook deployment, workflow creation</td>
+  </tr>
+</table>
+
+<!-- ================================================================== -->
+<!--  11. COST ESTIMATE                                                 -->
+<!-- ================================================================== -->
+
+<h2>11. Cost Estimate</h2>
+
+<table>
+  <tr><th>Operation</th><th>Warehouse</th><th>Time</th><th>Estimated Credits</th></tr>
+  <tr><td>COPY INTO (3 tables, ~188 MB)</td><td>X-Small</td><td>~30 seconds</td><td>~0.008</td></tr>
+  <tr><td>Silver Dynamic Table refresh (4 tables)</td><td>X-Small</td><td>~60 seconds</td><td>~0.017</td></tr>
+  <tr><td>Gold Dynamic Table refresh (5 tables)</td><td>X-Small</td><td>~45 seconds</td><td>~0.013</td></tr>
+  <tr><td>Streamlit queries (per session)</td><td>X-Small</td><td>~10 seconds</td><td>~0.003</td></tr>
+  <tr><td style="font-weight:700">Total (initial deployment)</td><td></td><td></td><td style="font-weight:700; color:#059669;">~0.04 credits (~$0.12 USD)</td></tr>
+</table>
+
+<p>
+  Ongoing cost is minimal — Dynamic Tables only refresh when upstream data changes, and the
+  warehouse auto-suspends after 60 seconds of inactivity.
+</p>
+
+<!-- ================================================================== -->
+<!--  12. CLEANUP                                                       -->
+<!-- ================================================================== -->
+
+<h2>12. Cleanup</h2>
+
+<p>To remove all demo objects, run <code>scripts/99_cleanup.sql</code> or execute:</p>
+
+<pre><code><span class="kw">DROP</span> STREAMLIT <span class="kw">IF EXISTS</span> AIR_DEMO.APP.AIR_DASHBOARD;
+<span class="kw">DROP</span> DATABASE <span class="kw">IF EXISTS</span> AIR_DEMO;
+<span class="kw">DROP</span> WAREHOUSE <span class="kw">IF EXISTS</span> AIR_DEMO_WH;</code></pre>
+
+<p>This removes everything — the database, all schemas, all tables, the stage, and the warehouse. Clean slate.</p>
+
+<!-- ================================================================== -->
+<!--  13. REPOSITORY STRUCTURE                                          -->
+<!-- ================================================================== -->
+
+<h2>13. Repository Structure</h2>
+
+<pre><code>air-immunisation-demo/
+├── README.md                              <span class="cm"># Quick-start guide</span>
+├── architecture.html                      <span class="cm"># Architecture diagram (open in browser)</span>
+├── user_guide.html                        <span class="cm"># This document</span>
+│
+├── data/
+│   ├── generate_synthetic_air_data.py     <span class="cm"># Data generator (already run)</span>
+│   ├── patients.csv                       <span class="cm"># 100K patient records</span>
+│   ├── providers.csv                      <span class="cm"># 2K provider records</span>
+│   └── vaccinations.csv                   <span class="cm"># 751K vaccination records</span>
+│
+├── scripts/
+│   ├── 01_setup_bronze.sql                <span class="cm"># Warehouse, DB, schemas, bronze tables, COPY INTO</span>
+│   ├── 02_silver_dynamic_tables.sql       <span class="cm"># 4 silver Dynamic Tables</span>
+│   ├── 03_gold_dynamic_tables.sql         <span class="cm"># 5 gold Dynamic Tables</span>
+│   ├── 04_deploy_streamlit.sql            <span class="cm"># Streamlit app deployment</span>
+│   ├── 05_manual_refresh.sql              <span class="cm"># Force refresh all Dynamic Tables</span>
+│   └── 99_cleanup.sql                     <span class="cm"># Drop everything</span>
+│
+└── streamlit/
+    └── streamlit_app.py                   <span class="cm"># 5-tab analytics dashboard</span></code></pre>
+
+<div class="doc-footer">
+  Australian Immunisation Register — Snowflake Demo &nbsp;·&nbsp; User Guide v1.0 &nbsp;·&nbsp; April 2026<br>
+  Built with Snowflake Dynamic Tables &amp; Streamlit in Snowflake
+</div>
+
+</div>
+
+</body>
+</html>
