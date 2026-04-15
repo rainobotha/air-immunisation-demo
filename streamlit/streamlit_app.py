@@ -69,8 +69,18 @@ with tab_overview:
         with st.container(border=True):
             st.subheader("Vaccinations by age group")
             age_data = run_query("""
-                SELECT patient_age_group AS age_group, COUNT(*) AS vaccinations
-                FROM AIR_DEMO.SILVER.VACCINATION_EVENTS
+                SELECT
+                    CASE
+                        WHEN DATEDIFF('month', ve.patient_dob, ve.administration_date) < 12  THEN 'Infant (<1yr)'
+                        WHEN DATEDIFF('month', ve.patient_dob, ve.administration_date) < 24  THEN 'Toddler (1-2yr)'
+                        WHEN DATEDIFF('month', ve.patient_dob, ve.administration_date) < 60  THEN 'Preschool (2-5yr)'
+                        WHEN DATEDIFF('year',  ve.patient_dob, ve.administration_date) < 12  THEN 'Child (5-12yr)'
+                        WHEN DATEDIFF('year',  ve.patient_dob, ve.administration_date) < 18  THEN 'Adolescent (12-18yr)'
+                        WHEN DATEDIFF('year',  ve.patient_dob, ve.administration_date) < 65  THEN 'Adult (18-65yr)'
+                        ELSE 'Senior (65+yr)'
+                    END AS age_group,
+                    COUNT(*) AS vaccinations
+                FROM AIR_DEMO.SILVER.VACCINATION_EVENTS ve
                 GROUP BY 1 ORDER BY 2 DESC
             """)
             st.bar_chart(age_data, x="AGE_GROUP", y="VACCINATIONS", horizontal=True)
@@ -94,25 +104,21 @@ with tab_coverage:
     st.caption("National aspirational target: 95%")
 
     coverage = run_query("""
-        SELECT state, age_group, is_indigenous,
-               SUM(total_patients)          AS total_patients,
-               SUM(patients_3plus_antigens) AS covered,
-               ROUND(SUM(patients_3plus_antigens) * 100.0 / NULLIF(SUM(total_patients), 0), 2) AS coverage_pct
-        FROM AIR_DEMO.GOLD.COVERAGE_BY_STATE_AGE
-        GROUP BY 1, 2, 3
+        SELECT state, is_indigenous,
+               total_patients,
+               patients_3plus_antigens AS covered,
+               coverage_rate_pct AS coverage_pct
+        FROM AIR_DEMO.GOLD.COVERAGE_BY_STATE
     """)
 
     with st.sidebar:
         st.header(":material/filter_list: Filters")
         states = sorted(coverage["STATE"].dropna().unique().tolist())
         selected_states = st.multiselect("State/territory", states, default=states)
-        age_groups = sorted(coverage["AGE_GROUP"].dropna().unique().tolist())
-        selected_ages = st.multiselect("Age group", age_groups, default=age_groups)
         indigenous_filter = st.radio("Indigenous status", ["All", "Indigenous only", "Non-indigenous only"])
 
     filtered = coverage[
-        coverage["STATE"].isin(selected_states) &
-        coverage["AGE_GROUP"].isin(selected_ages)
+        coverage["STATE"].isin(selected_states)
     ]
     if indigenous_filter == "Indigenous only":
         filtered = filtered[filtered["IS_INDIGENOUS"] == True]
@@ -140,28 +146,15 @@ with tab_coverage:
         if worst is not None:
             st.metric(f"Lowest: {worst['STATE']}", f"{worst['COVERAGE_PCT']}%", border=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        with st.container(border=True):
-            st.subheader("Coverage by state")
-            st.bar_chart(state_summary, x="STATE", y="COVERAGE_PCT")
-            st.caption("Dashed line = 95% national target")
-
-    with col2:
-        with st.container(border=True):
-            st.subheader("Coverage by age group")
-            age_summary = (
-                filtered.groupby("AGE_GROUP")
-                .agg({"TOTAL_PATIENTS": "sum", "COVERED": "sum"})
-                .reset_index()
-            )
-            age_summary["COVERAGE_PCT"] = round(age_summary["COVERED"] * 100.0 / age_summary["TOTAL_PATIENTS"].replace(0, pd.NA), 2)
-            st.bar_chart(age_summary, x="AGE_GROUP", y="COVERAGE_PCT")
+    with st.container(border=True):
+        st.subheader("Coverage by state")
+        st.bar_chart(state_summary, x="STATE", y="COVERAGE_PCT")
+        st.caption("Dashed line = 95% national target")
 
     with st.container(border=True):
         st.subheader("Detailed coverage data")
         st.dataframe(
-            filtered[["STATE", "AGE_GROUP", "IS_INDIGENOUS", "TOTAL_PATIENTS", "COVERED", "COVERAGE_PCT"]],
+            filtered[["STATE", "IS_INDIGENOUS", "TOTAL_PATIENTS", "COVERED", "COVERAGE_PCT"]],
             hide_index=True,
             use_container_width=True,
             column_config={
