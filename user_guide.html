@@ -1052,7 +1052,7 @@
   Just a browser and a Snowflake account.
 </div>
 
-<p>Estimated time: <strong>20-30 minutes</strong> (mostly waiting for file uploads and Dynamic Table refreshes).</p>
+<p>Estimated time: <strong>20-30 minutes</strong> (mostly waiting for file uploads and Dynamic Table refreshes). 8 steps total.</p>
 
 <div class="step">
   <div class="step-num">1</div>
@@ -1072,11 +1072,31 @@
 <div class="step">
   <div class="step-num">2</div>
   <div class="step-body">
+    <h4>Extract the CSV files</h4>
+    <p>The data files are split into 20 MB parts for easier download. Choose the instructions for your operating system:</p>
+    <div class="box box-purple">
+      <strong>macOS / Linux</strong>
+      The archive parts are in <code>data/mac/</code>. Open Terminal in that folder and run:<br>
+      <code>cat air_data.tar.gz.* | tar xzf -</code>
+    </div>
+    <div class="box box-blue">
+      <strong>Windows</strong>
+      The archive parts are in <code>data/windows/</code>. Open PowerShell in that folder and run:<br>
+      <code>cmd /c "copy /b air_data_win.zip.aa+air_data_win.zip.ab+air_data_win.zip.ac+air_data_win.zip.ad combined.zip"</code><br>
+      Then extract <code>combined.zip</code> using File Explorer (right-click → Extract All).
+    </div>
+    <p>You should now have three CSV files: <code>patients.csv</code> (~18 MB), <code>providers.csv</code> (~275 KB), and <code>vaccinations.csv</code> (~170 MB).</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-body">
     <h4>Upload CSV files to stage</h4>
     <ol>
       <li>In the left sidebar, navigate to <strong>Data &gt; Databases &gt; AIR_DEMO &gt; BRONZE &gt; Stages &gt; AIR_LANDING</strong></li>
       <li>Click the <strong>+ Files</strong> button</li>
-      <li>Upload all three files from the <code>data/</code> folder:
+      <li>Upload all three extracted CSV files:
         <ul>
           <li><code>patients.csv</code> (~18 MB)</li>
           <li><code>providers.csv</code> (~275 KB)</li>
@@ -1088,7 +1108,7 @@
 </div>
 
 <div class="step">
-  <div class="step-num">3</div>
+  <div class="step-num">4</div>
   <div class="step-body">
     <h4>Load data into bronze tables</h4>
     <ol>
@@ -1106,7 +1126,7 @@
 </div>
 
 <div class="step">
-  <div class="step-num">4</div>
+  <div class="step-num">5</div>
   <div class="step-body">
     <h4>Create silver Dynamic Tables</h4>
     <ol>
@@ -1119,7 +1139,7 @@
 </div>
 
 <div class="step">
-  <div class="step-num">5</div>
+  <div class="step-num">6</div>
   <div class="step-body">
     <h4>Create gold Dynamic Tables</h4>
     <ol>
@@ -1131,7 +1151,7 @@
 </div>
 
 <div class="step">
-  <div class="step-num">6</div>
+  <div class="step-num">7</div>
   <div class="step-body">
     <h4>Trigger initial refresh</h4>
     <ol>
@@ -1148,7 +1168,7 @@
 </div>
 
 <div class="step">
-  <div class="step-num">7</div>
+  <div class="step-num">8</div>
   <div class="step-body">
     <h4>Deploy the Streamlit dashboard</h4>
     <ol>
@@ -1276,9 +1296,10 @@
 │
 ├── data/
 │   ├── generate_synthetic_air_data.py     <span class="cm"># Data generator (already run)</span>
-│   ├── patients.csv                       <span class="cm"># 100K patient records</span>
-│   ├── providers.csv                      <span class="cm"># 2K provider records</span>
-│   └── vaccinations.csv                   <span class="cm"># 751K vaccination records</span>
+│   ├── mac/                               <span class="cm"># Split tar.gz archive (macOS/Linux)</span>
+│   │   ├── air_data.tar.gz.aa – .ad       <span class="cm"># cat *.tar.gz.* | tar xzf -</span>
+│   └── windows/                           <span class="cm"># Split zip archive (Windows)</span>
+│       └── air_data_win.zip.aa – .ad      <span class="cm"># copy /b ... combined.zip</span>
 │
 ├── scripts/
 │   ├── 01_setup_bronze.sql                <span class="cm"># Warehouse, DB, schemas, bronze tables, COPY INTO</span>
