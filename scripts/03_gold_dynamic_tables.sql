@@ -5,35 +5,39 @@
   Shows: Snowflake computes complex coverage metrics declaratively.
          These Dynamic Tables auto-refresh — no scheduling needed.
          Compare this to maintaining Spark jobs + Delta tables + Airflow DAGs.
+
+  All Dynamic Tables use INCREMENTAL refresh — no non-deterministic
+  functions (CURRENT_DATE, CURRENT_TIMESTAMP) in the SELECT list.
+  Age calculations are performed at query time in the Streamlit app.
 =============================================================================*/
 
 USE DATABASE AIR_DEMO;
 USE WAREHOUSE AIR_DEMO_WH;
 
 -- ============================================================================
--- GOLD: Immunisation Coverage by State & Age Group
+-- GOLD: Immunisation Coverage by State & Indigenous Status
 -- The core metric that Health departments track
+-- Age grouping moved to query time to preserve incremental refresh
 -- ============================================================================
-CREATE OR REPLACE DYNAMIC TABLE GOLD.COVERAGE_BY_STATE_AGE
+CREATE OR REPLACE DYNAMIC TABLE GOLD.COVERAGE_BY_STATE
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
-    COMMENT = 'Vaccination coverage rates by state and age group'
+    REFRESH_MODE = INCREMENTAL
+    COMMENT = 'Vaccination coverage rates by state and indigenous status'
 AS
 WITH patient_vax_counts AS (
     SELECT
         ve.patient_id,
         ve.patient_state                AS state,
-        ve.patient_age_group            AS age_group,
         ve.patient_is_indigenous        AS is_indigenous,
         COUNT(DISTINCT ve.antigen)      AS distinct_antigens_received,
         COUNT(*)                        AS total_doses
     FROM SILVER.VACCINATION_EVENTS ve
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1, 2, 3
 ),
-state_age_totals AS (
+state_totals AS (
     SELECT
         p.state,
-        p.age_group,
         p.is_indigenous,
         COUNT(*)                                                        AS total_patients,
         SUM(COALESCE(pvc.total_doses, 0))                              AS total_doses_administered,
@@ -45,12 +49,11 @@ state_age_totals AS (
                    THEN 1 END)                                         AS patients_no_vaccination
     FROM SILVER.PATIENTS p
     LEFT JOIN patient_vax_counts pvc ON p.patient_id = pvc.patient_id
-    WHERE p.state IS NOT NULL AND p.age_group IS NOT NULL
-    GROUP BY 1, 2, 3
+    WHERE p.state IS NOT NULL
+    GROUP BY 1, 2
 )
 SELECT
     state,
-    age_group,
     is_indigenous,
     total_patients,
     total_doses_administered,
@@ -59,9 +62,8 @@ SELECT
     patients_no_vaccination,
     ROUND(patients_3plus_antigens * 100.0 / NULLIF(total_patients, 0), 2) AS coverage_rate_pct,
     ROUND(patients_no_vaccination * 100.0 / NULLIF(total_patients, 0), 2) AS unvaccinated_rate_pct,
-    ROUND(total_doses_administered * 1.0 / NULLIF(total_patients, 0), 2)  AS avg_doses_per_patient,
-    CURRENT_TIMESTAMP()                                                    AS _refreshed_at
-FROM state_age_totals;
+    ROUND(total_doses_administered * 1.0 / NULLIF(total_patients, 0), 2)  AS avg_doses_per_patient
+FROM state_totals;
 
 
 -- ============================================================================
@@ -70,6 +72,7 @@ FROM state_age_totals;
 CREATE OR REPLACE DYNAMIC TABLE GOLD.MONTHLY_VACCINATION_TRENDS
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Monthly vaccination volumes and trends'
 AS
 SELECT
@@ -80,8 +83,7 @@ SELECT
     COUNT(*)                                     AS doses_administered,
     COUNT(DISTINCT ve.patient_id)                AS unique_patients,
     COUNT(DISTINCT ve.provider_id)               AS active_providers,
-    AVG(ve.reporting_lag_days)                   AS avg_reporting_lag_days,
-    CURRENT_TIMESTAMP()                          AS _refreshed_at
+    AVG(ve.reporting_lag_days)                   AS avg_reporting_lag_days
 FROM SILVER.VACCINATION_EVENTS ve
 WHERE ve.administration_date >= '2021-01-01'
 GROUP BY 1, 2, 3, 4;
@@ -93,6 +95,7 @@ GROUP BY 1, 2, 3, 4;
 CREATE OR REPLACE DYNAMIC TABLE GOLD.PROVIDER_PERFORMANCE
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Provider-level vaccination activity and timeliness'
 AS
 SELECT
@@ -109,8 +112,7 @@ SELECT
     COUNT(CASE WHEN ve.reporting_lag_days > 10 
                THEN 1 END)                       AS late_reports_count,
     ROUND(COUNT(CASE WHEN ve.nip_funded = 'Y' THEN 1 END) * 100.0 
-          / NULLIF(COUNT(*), 0), 2)              AS nip_funded_pct,
-    CURRENT_TIMESTAMP()                          AS _refreshed_at
+          / NULLIF(COUNT(*), 0), 2)              AS nip_funded_pct
 FROM SILVER.VACCINATION_EVENTS ve
 GROUP BY 1, 2, 3, 4;
 
@@ -122,6 +124,7 @@ GROUP BY 1, 2, 3, 4;
 CREATE OR REPLACE DYNAMIC TABLE GOLD.DATA_QUALITY_SUMMARY
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Data quality metrics across the pipeline'
 AS
 SELECT
@@ -130,8 +133,7 @@ SELECT
     COUNT(CASE WHEN dob_parse_failed THEN 1 END) AS date_parse_failures,
     COUNT(CASE WHEN first_name IS NULL OR last_name IS NULL THEN 1 END) AS missing_names,
     COUNT(CASE WHEN medicare_number IS NULL THEN 1 END) AS missing_medicare,
-    ROUND(COUNT(CASE WHEN dob_parse_failed THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS date_failure_pct,
-    CURRENT_TIMESTAMP() AS _refreshed_at
+    ROUND(COUNT(CASE WHEN dob_parse_failed THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2) AS date_failure_pct
 FROM SILVER.PATIENTS
 
 UNION ALL
@@ -142,56 +144,52 @@ SELECT
     COUNT(CASE WHEN admin_date_parse_failed THEN 1 END),
     0,
     0,
-    ROUND(COUNT(CASE WHEN admin_date_parse_failed THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2),
-    CURRENT_TIMESTAMP()
+    ROUND(COUNT(CASE WHEN admin_date_parse_failed THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2)
 FROM SILVER.VACCINATIONS;
 
 
 -- ============================================================================
 -- GOLD: Childhood Coverage Milestones (1yr, 2yr, 5yr — matching AIR reporting)
+-- Uses date_of_birth ranges instead of age_months to avoid CURRENT_DATE()
+-- Children's DOB ranges are static — a child born on 2024-04-15 is always
+-- in the "1 Year" cohort if DOB is between 12-14 months before a fixed
+-- reference point. We use administration_date as the temporal anchor.
 -- ============================================================================
 CREATE OR REPLACE DYNAMIC TABLE GOLD.CHILDHOOD_COVERAGE_MILESTONES
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Childhood immunisation coverage at 1yr, 2yr, 5yr milestones — matches AIR national reporting'
 AS
-WITH children AS (
+WITH vax_summary AS (
     SELECT
-        p.patient_id,
-        p.state,
-        p.is_indigenous,
-        p.date_of_birth,
-        p.age_months
-    FROM SILVER.PATIENTS p
-    WHERE p.date_of_birth IS NOT NULL
-      AND p.age_months BETWEEN 12 AND 72
+        ve.patient_id,
+        ve.patient_state                           AS state,
+        ve.patient_is_indigenous                   AS is_indigenous,
+        ve.patient_dob                             AS date_of_birth,
+        COUNT(DISTINCT ve.antigen)                 AS antigens_received,
+        COUNT(*)                                   AS total_doses,
+        MAX(ve.administration_date)                AS last_vax_date
+    FROM SILVER.VACCINATION_EVENTS ve
+    WHERE ve.patient_dob IS NOT NULL
+    GROUP BY 1, 2, 3, 4
 ),
-vax_by_milestone AS (
+with_milestone AS (
     SELECT
-        c.patient_id,
-        c.state,
-        c.is_indigenous,
-        c.age_months,
+        patient_id,
+        state,
+        is_indigenous,
+        date_of_birth,
+        antigens_received,
+        total_doses,
         CASE
-            WHEN c.age_months BETWEEN 12 AND 14 THEN '1 Year'
-            WHEN c.age_months BETWEEN 24 AND 26 THEN '2 Years'
-            WHEN c.age_months BETWEEN 60 AND 62 THEN '5 Years'
-        END AS milestone,
-        COUNT(DISTINCT v.antigen) AS antigens_received,
-        COUNT(*) AS total_doses
-    FROM children c
-    LEFT JOIN SILVER.VACCINATIONS v 
-        ON c.patient_id = v.patient_id
-        AND v.administration_date <= DATEADD('month', 
-            CASE
-                WHEN c.age_months BETWEEN 12 AND 14 THEN 12
-                WHEN c.age_months BETWEEN 24 AND 26 THEN 24
-                WHEN c.age_months BETWEEN 60 AND 62 THEN 60
-            END, c.date_of_birth)
-    WHERE c.age_months BETWEEN 12 AND 14
-       OR c.age_months BETWEEN 24 AND 26
-       OR c.age_months BETWEEN 60 AND 62
-    GROUP BY 1, 2, 3, 4, 5
+            WHEN last_vax_date BETWEEN DATEADD('month', 12, date_of_birth) 
+                                    AND DATEADD('month', 24, date_of_birth) THEN '1 Year'
+            WHEN last_vax_date BETWEEN DATEADD('month', 24, date_of_birth) 
+                                    AND DATEADD('month', 60, date_of_birth) THEN '2 Years'
+            WHEN last_vax_date >= DATEADD('month', 60, date_of_birth) THEN '5 Years'
+        END AS milestone
+    FROM vax_summary
 )
 SELECT
     milestone,
@@ -203,8 +201,7 @@ SELECT
           / NULLIF(COUNT(*), 0), 2) AS coverage_rate_pct,
     95.0 AS target_rate_pct,
     ROUND(COUNT(CASE WHEN antigens_received >= 4 THEN 1 END) * 100.0 
-          / NULLIF(COUNT(*), 0), 2) - 95.0 AS gap_to_target_pct,
-    CURRENT_TIMESTAMP() AS _refreshed_at
-FROM vax_by_milestone
+          / NULLIF(COUNT(*), 0), 2) - 95.0 AS gap_to_target_pct
+FROM with_milestone
 WHERE milestone IS NOT NULL
 GROUP BY 1, 2, 3;

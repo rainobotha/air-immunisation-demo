@@ -23,6 +23,7 @@ USE WAREHOUSE AIR_DEMO_WH;
 CREATE OR REPLACE DYNAMIC TABLE SILVER.PATIENTS
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Cleansed patient demographics — parsed dates, standardised fields'
 AS
 SELECT
@@ -34,19 +35,6 @@ SELECT
     TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD')                        AS date_of_birth,
     CASE WHEN TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD') IS NULL 
          THEN TRUE ELSE FALSE END                                    AS dob_parse_failed,
-    DATEDIFF('year', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), 
-             CURRENT_DATE())                                         AS age_years,
-    DATEDIFF('month', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), 
-             CURRENT_DATE())                                         AS age_months,
-    CASE 
-        WHEN DATEDIFF('month', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 12  THEN 'Infant (<1yr)'
-        WHEN DATEDIFF('month', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 24  THEN 'Toddler (1-2yr)'
-        WHEN DATEDIFF('month', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 60  THEN 'Preschool (2-5yr)'
-        WHEN DATEDIFF('year', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 12   THEN 'Child (5-12yr)'
-        WHEN DATEDIFF('year', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 18   THEN 'Adolescent (12-18yr)'
-        WHEN DATEDIFF('year', TRY_TO_DATE(date_of_birth, 'YYYY-MM-DD'), CURRENT_DATE()) < 65   THEN 'Adult (18-65yr)'
-        ELSE 'Senior (65+yr)'
-    END                                                              AS age_group,
     UPPER(TRIM(gender))                                              AS gender,
     COALESCE(NULLIF(TRIM(indigenous_status), ''), 'Not Stated')      AS indigenous_status,
     CASE WHEN indigenous_status IN ('Aboriginal', 'Torres Strait Islander', 'Both')
@@ -69,6 +57,7 @@ WHERE patient_id IS NOT NULL;
 CREATE OR REPLACE DYNAMIC TABLE SILVER.PROVIDERS
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Cleansed provider reference data'
 AS
 SELECT
@@ -95,6 +84,7 @@ WHERE provider_id IS NOT NULL;
 CREATE OR REPLACE DYNAMIC TABLE SILVER.VACCINATIONS
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Cleansed, deduplicated vaccination events'
 AS
 WITH deduplicated AS (
@@ -141,6 +131,7 @@ WHERE _rn = 1;
 CREATE OR REPLACE DYNAMIC TABLE SILVER.VACCINATION_EVENTS
     TARGET_LAG = '1 hour'
     WAREHOUSE = AIR_DEMO_WH
+    REFRESH_MODE = INCREMENTAL
     COMMENT = 'Enriched vaccination events — joined with patient demographics and provider details'
 AS
 SELECT
@@ -162,9 +153,6 @@ SELECT
     p.first_name          AS patient_first_name,
     p.last_name           AS patient_last_name,
     p.date_of_birth       AS patient_dob,
-    p.age_years           AS patient_age_years,
-    p.age_months          AS patient_age_months,
-    p.age_group           AS patient_age_group,
     p.gender              AS patient_gender,
     p.indigenous_status   AS patient_indigenous_status,
     p.is_indigenous       AS patient_is_indigenous,
